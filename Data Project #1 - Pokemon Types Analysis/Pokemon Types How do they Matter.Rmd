@@ -1,0 +1,186 @@
+---
+title: "Pokemon Types: How Do They Matter"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Pokemon Types and how they Affect Other Characteristics
+
+The goal of this document is to see how the type of Pokemon matters and if all types are treated equally.
+
+#### First Question: How many pokemon are there of each type?\
+\
+There are many different types in Pokemon such as grass, water, and fire. These types could be analogous to their attribute or what they excel at. Water types excel at using water and so are strong against fire types (Water puts out Fire) and weak against grass (Plants soak up Water). What we want to look at is whether Gamefreak, the makers of Pokemon, split up the types across all pokemon evenly.
+
+```{r, include=FALSE}
+Master <- read.csv("~/Shangeeth/Projects/Pokemon/pokemon.csv")
+library("stringr")
+#summary(Master) #Look for unusual values/patterns
+
+#summary(is.na(Master)) #Check the null values of the dataset to see if row should be deleted
+
+#There are null values in Height, Weight, and %male which are not values we will use so they will just be ignored rather than delete the row or change the value
+
+#Question 1, How many pokemon of each type?
+
+Types <- Master[c("type1","type2")] #Reduce the large data set to the columns we care about
+
+#summary(as.factor(Types$type1))
+#summary(as.factor(Types$type2))
+#summary(as.factor(Types$type1)) + summary(as.factor(Types$type2)) <- This doesn't work but is what we want
+
+#Next I want to make a column for each type saying whether a pokemon has this type in column 1 or column 2
+#For the for loop we need a list of types to iterate over
+#We will use the unique function and double check that type1 and type2 have the same unique set of types
+#unique(Types$type1) 
+#unique(Types$type2) #There is an extra blank value in type2 which shouldn't matter for the merge
+
+for (i in c(unique(Types$type1))){
+  List1 <- Types$type1 == i | Types$type2 == i #Here we say that type1 or type 2 is what we want than the pokemon has that type
+  Types[,paste0(i)] <- as.numeric(List1) #Turn the logical values into numeric 0 & 1
+}
+
+Total_by_Type <- colSums(Types[,c(3:ncol(Types))]) #Creates a vector that has the total amount of pokemon as a number with each column titled by the type
+sort(Total_by_Type,decreasing = TRUE) #Sorts it from largest to smallest
+
+#Colours for the barplot that will show the sorted data as a graphical representation
+
+PkmCol <- c("#6890F0","#A8A878","#A890F0",'#78C850',"#F85888","#A8B820","#F08030","#A040A0","#E0C068",
+            "#B8A038","#C03028","#705848","#F8D030","#EE99AC","#B8B8D0","#7038F8","#705898","#98D8D8")
+
+
+```
+
+The distribution, counting pokemon with two types twice, once for each type, is as follows:
+ 
+```{r, echo=FALSE}
+barplot(sort(Total_by_Type,decreasing = TRUE),ylab = "# of pokemon", xlab = "Types",col = PkmCol, main = "# of Pokemon by Type")
+```
+
+Here we see there is not an even distribution of pokemon across all the types. The most is of water pokemon and the least is of ice and ghost types. Some reasons could be that every pokemon region (area the game takes place) has an ocean/lake/sea while they don't all have a cemetery or mountain/glacier like region. Also there are only so many variations of a ghost type that could be made limiting design space for unique options.
+
+#### Second Question: Is there a correlation between a Pokemon's type and it's Stats?\
+\
+Every pokemon, like animals, has something they're good at. Cheetahs are fast, gorillas are strong, and turtles are defensive. In pokemon these attributes are called stats and they are as follows: speed, attack, defense, special attack, and special defense. Adding all 5 together forms the Base Stat Total (BST), which is what we are using for the overall strength of each pokemon. Baby pokemon would tend to have lower BST and legendary pokemon would tend to have higher BST. To find a correlation we would have to see the average BST for each type and compare it to the average BST of all pokemon. The following plots show the boxplots of BST for three specific types compared to all pokemon:
+
+```{r, include=FALSE}
+Stats <- Master[c("type1","type2","attack","defense","speed","sp_attack","sp_defense","base_total")] #Reduce the large data set to the columns we care about
+
+#Now we get the same Type Column to separate the data by type
+
+for (i in c(unique(Stats$type1))){
+  List1 <- Stats$type1 == i | Stats$type2 == i #Here we say that type1 or type 2 is what we want than the pokemon has that type
+  for(j in c(1:801)){ #Across all rows, this for loop changes the True and False values to something for understandable when we plot the data
+    if(List1[j] == TRUE){
+    List1[j]<-paste("#",str_to_title(i),"Type")
+    }
+    else {
+      List1[j]<-paste("Not",str_to_title(i),"Type")
+    }
+  }
+  Stats[,paste(i)] <- List1 #Sets the vector as a column in our table
+  
+}
+
+#Create a table of colours to apply it properly to each boxplot
+
+PkmColTab <- data.frame(c("#6890F0","#A8A878","#A890F0",'#78C850',"#F85888","#A8B820","#F08030","#A040A0","#E0C068",
+                          "#B8A038","#C03028","#705848","#F8D030","#EE99AC","#B8B8D0","#7038F8","#705898","#98D8D8"))
+
+row.names(PkmColTab) <- c("water","normal","flying","grass","psychic","bug","fire","poison","ground","rock","fighting","dark","electric","fairy","steel","dragon","ghost","ice")
+```
+
+```{r, echo=FALSE, out.width="80%"}
+plot(as.factor(Stats[,"steel"]),Stats$base_total,
+         xlab = paste("Steel","Type VS. Non -","Steel","Type"),
+         ylab = "Base Stat Total",
+         main = paste("Comparison of BST of Pokemon with the\n","Steel","type to Pokemon Without it"),
+         col= c(PkmColTab["steel",1],"#FFFFFF"))
+```
+```{r, echo=FALSE, out.width="80%"}
+plot(as.factor(Stats[,"dragon"]),Stats$base_total,
+         xlab = paste("Dragon","Type VS. Non -","Dragon","Type"),
+         ylab = "Base Stat Total",
+         main = paste("Comparison of BST of Pokemon with the\n","Dragon","type to Pokemon Without it"),
+         col= c(PkmColTab["dragon",1],"#FFFFFF"))
+```
+```{r, echo=FALSE, out.width="200%"}
+plot(as.factor(Stats[,"bug"]),Stats$base_total,
+         xlab = paste("Bug","Type VS. Non -","Bug","Type"),
+         ylab = "Base Stat Total",
+         main = paste("Comparison of BST of Pokemon with the\n","Bug","type to Pokemon Without it"),
+         col= c(PkmColTab["bug",1],"#FFFFFF"))
+
+```
+
+Boxplots show the median not the mean at the center but it's a better way to compare distributions of data while still getting information on the center of data. In this case Steel and Dragon have a median above the distribution of all pokemon while Bug type have a median below the distribution of all Pokemon. Simply, this means dragon types tend to be overstated and bug types tend to be understated relative to all pokemon. Now that we know the type of pokemon has an effect on its Stats, we want to understand how much this effect is for each type.
+
+#### Third Question: Can we quantify this correlation and see if it's statistically significant?\
+\
+In Statistics the question 'how much?' is very important and has been studied rigourously. While there may be a difference in the mean between dragon types and all types, is this difference significant from a statistical point of view or is it insignificant. The question we are answering is "How much of difference between the mean of the group and the mean of the whole in order for the difference to indicate a meaningful change?" We accomplish this with a 2-sample t-test on each of the types compared to all Pokemon leading to 18 different P-values and 18 different T-Stats.
+
+```{r, include=FALSE}
+table1 = data.frame(unique(Stats$type1)) #Create a table with just the type data 
+
+#Then add the t-stat and p-value from the two-sample t-test to see if there is a statistical difference in means
+for(i in c(1:18)){
+  x = Stats[which(Stats[,i+8]==str_to_title(paste("#",table1[i,1],"Type"))),] #subsets the data based on the type we created in the previous section to be used as one of the samples
+  table1[i,2] <- t.test(x$base_total,Stats$base_total)$p.value #Adds the p-value from the 2 sample t test for that type into that row
+  table1[i,3] <- t.test(x$base_total,Stats$base_total)$statistic
+  table1[i,4] <- mean(x$base_total)#Same has above except for the t stat
+}
+
+#Merges the colour table with table1 to have the p-values and the colour RGB code in the same row
+colnames(table1) <- c("Types","P_Value","T_Stat","Mean")
+row.names(table1) <- table1$Types
+table2 <- merge(table1,PkmColTab,by = "row.names",all=TRUE)
+colnames(table2) <- c("Types2","Types","P_Value","T_Stat","Mean_BST","Colours")
+
+table2
+
+t_stat_order <- order(-table2$T_Stat) #Create a vector of the order the T stat table from largest to smallest to see the outliers at the edges of the graphs (As we did a two-tailed t test)
+P_Value_order <- order(table2$P_Value) #Same as a above but for the p-value
+
+t_stat_Table <- table2[t_stat_order,] #Manually sort table2 by putting it in the order of the t_stat_order, a vector with numbers representing the row in table2
+p_Value_Table <- table2[P_Value_order,] 
+```
+
+A P-Value is the probability a difference occurred due to random chance. This means we are looking for low probabilities (<5%) as they would show that the difference did not occur due to random chance. Ordered from left to right, we see the low percentages at the beginning and it looks like the first 6 are below 5%. We can confirm this by printing the p-values for the first 6 types and seeing they are all below 0.05 or 5%.
+
+```{r, echo=FALSE, out.width="80%"}
+barplot(p_Value_Table$P_Value,names.arg = p_Value_Table$Types,col = p_Value_Table$Colours,xlab = 'Types' ,ylab = "P-Value as %", 
+        main = "P-Value of 2 sample T test comparing the mean BST of \n the Individual Type of Pokemon with all Pokemon") #Plot showing the p-values of the t test against the types
+
+p_Value_Table[which(p_Value_Table$P_Value<0.05),c(2,3)]
+ 
+```
+
+The next two graphs first show the average BST per type then the T Stat from the 2 sample t Test of that type compared to all Pokemon. As the T stat is correlated with the mean of what is being measured, BST, you'll notice a trend of the T-Stat dropping along with the Mean BST as we move from left to right. For the T Stat we want the absolute value to be over 2. We choose 2 for the same reason we choose 5% for the P-Value, it is based on what is deemed just low enough that we don't commit a Type I error, we mistake a type of having a significant difference when the difference was due to randomness, and it is just high enough that we don't commit a type II error, we miss a type that had a significant difference because we attributed it to randomness. The absolute value means we will be dealing with some negatives in the second graph which make it hard to find those that are over 2/under -2 but we fix that with the third graph.
+
+```{r, echo=FALSE, out.width="80%"}
+barplot(t_stat_Table$Mean_BST,names.arg = t_stat_Table$Types,col = t_stat_Table$Colours, xlab = 'Types', ylab = "Base Total Stat",
+        main = "Mean Base Stat Total for each Individual Type of Pokemon\nOrdered by Signed Value of T-Stat")
+```
+```{r, echo=FALSE, out.width="80%"}
+barplot(t_stat_Table$T_Stat,names.arg = t_stat_Table$Types,col = t_stat_Table$Colours,xlab = 'Types' ,ylab = "T-Stat", 
+        main = "T-Stat of 2 sample T test comparing the mean BST of \n the Individual Type of Pokemon with all Pokemon") #Plot showing the t-stat of the t test against the types in largest to smallest order
+```
+
+Here we sort by the absolute value of the T-Stat instead of in order from positive to negative. Now we can can clearly see which types are over 2/under -2. If the T stat is over 2 then the mean BST for that type is greater than the overall mean for all pokemon, that type is statistically overstated. If the T stat is under -2 then the mean BST for that type is less than the overall mean for all pokemon, that type is statistically understated.
+
+```{r, echo=FALSE, out.width="80%"}
+barplot(p_Value_Table$T_Stat,names.arg = p_Value_Table$Types,col = p_Value_Table$Colours,xlab = 'Types' ,ylab = "T-Stat", 
+        main = "T-Stat of 2 sample T test comparing the mean BST of the Individual\nType of Pokemon with all Pokemon Ordered by Absolute Value of T-Stat") #Plot showing the t-stat in order of the absolute value of the t-stat so all the outliers are in one place 
+```
+
+So we can quantify this correlation, with the T stats and P-Values, and the following types have a statistically significant difference, Steel, Dragon, and Psychic have a positive difference and Bug, Poison, Normal have a negative difference.
+
+Thank you for reading through this report, please find more of my work at: https://github.com/ShanmanT/Data_Analytics_Projects
+
+
+
