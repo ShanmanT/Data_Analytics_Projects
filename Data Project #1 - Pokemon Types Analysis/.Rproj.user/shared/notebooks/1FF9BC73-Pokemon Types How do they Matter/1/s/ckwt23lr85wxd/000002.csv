@@ -1,0 +1,5 @@
+"0","Master <- read.csv(""~/Shangeeth/Projects/Pokemon/pokemon.csv"")
+"
+"2","cannot open file 'C:/Users/wertm/Documents/Shangeeth/Projects/Pokemon/pokemon.csv': No such file or directory"
+"2","Error in file(file, ""rt"") : cannot open the connection
+"

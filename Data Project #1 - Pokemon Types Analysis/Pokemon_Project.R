@@ -1,4 +1,4 @@
-Master <- read.csv("~/Shangeeth/Projects/Pokemon/pokemon.csv")
+Master <- read.csv("~/Shangeeth/Projects/Data Project #1 - Pokemon Types Analysis/pokemon.csv")
 library(stringr)
 library(tidyverse)
 library(colorspace)
