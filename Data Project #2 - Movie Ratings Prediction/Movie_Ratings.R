@@ -2,8 +2,8 @@
 
 #Step 1: Find which genres to do the separation on 
 
-Movies <- read.csv("~/Shangeeth/Projects/Data Project #2 - Movie Ratings Prediction/IMDb movies.csv")
-
+Movies <- read.csv("~/Shangeeth/Projects/Data_Analytics_Projects/Data Project #2 - Movie Ratings Prediction/IMDb movies.csv")
+Ratings <- read.csv("~/Shangeeth/Projects/Data_Analytics_Projects/Data Project #2 - Movie Ratings Prediction/IMDb ratings.csv")
 library(sjmisc)
 
 #Separate the genre column to understand the contents and create a boolean variable for each genre rather than a character variable

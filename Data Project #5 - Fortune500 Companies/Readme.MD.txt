@@ -1,0 +1,1 @@
+Data collected from: https://www.kaggle.com/darinhawley/fortune-500-companies-19552021
