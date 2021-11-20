@@ -1,6 +1,6 @@
 library (tidyverse)
 library(rPref)
-library(igraph)
+
 #Now that we have the combined data for the Mario Kart Racers, let's see what patterns we can find
 
 Mario_Kart <- read_csv("combined.csv")
@@ -74,10 +74,4 @@ summary(lm(Speed~Acceleration, Mario_Kart))$coefficients[2,1] #negative
 
 Mario_Kart %>% ggplot(aes(Mini_Turbo,Acceleration)) + geom_point(size = 6) + geom_step(direction="hv")
 
-p <- high(Speed)
-
-test <- psel(Mario_Kart,pref = p,top = nrow(Mario_Kart))
-
-
-
-
+sky1 <- psel(Mario_Kart, high(Speed)*high(Acceleration))

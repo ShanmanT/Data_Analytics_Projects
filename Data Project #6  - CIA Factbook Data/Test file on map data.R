@@ -1,0 +1,25 @@
+library(tidyverse)
+library(sf)
+theme_set(theme_bw())
+library(rnaturalearthdata)
+library(rnaturalearth)
+library(rgeos)
+
+world1 <- ne_countries(scale = "small",returnclass = "sf")
+class(world1)
+world2 <- ne_countries(scale = "medium", returnclass = "sf")
+View(world2)
+ggplot(world2) + geom_sf(aes(fill = pop_est)) + scale_fill_gradient(low = "Red", high = "Green")
+
+ggplot(data = world2) + geom_sf(aes(fill = type))
+ggplot(data = world2) + geom_sf(aes(fill = continent))
+ggplot(data = world2) + geom_sf(aes(fill = region_un))
+ggplot(filter(world2,continent == "Asia")) + geom_sf(aes(fill = subregion),)+geom_sf_label(aes(label = name),size = 2)
+ggplot(filter(world2,subregion == "Western Asia")) + geom_sf(aes(fill = name),)+geom_sf_label(aes(label = name),size = 2)
+
+ggplot(world2) + geom_sf(aes(fill = economy))
+ggplot(world2) + geom_sf(aes(fill = income_grp))
+ggplot(world2) + geom_sf(aes(fill = mapcolor7)) + scale_fill_gradient(low = "Red", high = "Green")
+ggplot(world2) + geom_sf(aes(fill = mapcolor8)) + scale_fill_gradient(low = "Red", high = "Green")
+ggplot(world2) + geom_sf(aes(fill = mapcolor9)) + scale_fill_gradient(low = "Red", high = "Green")
+
