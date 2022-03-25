@@ -70,6 +70,14 @@ Genres_and_Ratings %>% ggplot()+geom_boxplot(aes(Mystery, mean_vote,group = Myst
 #What we see is that Drama is slightly higher in rating than all other movies and 
 #horror is very much lower in rating compared to all other movies
 
-#Let's test the significance of this difference with a t test
+##Power test to see if sample size is big enough
+
+#Let's test how correlated this difference in the observations are with linear regression
+
+plot(lm(Drama~mean_vote,Genres_and_Ratings)$model)
+plot(lm(Horror~mean_vote,Genres_and_Ratings)$model)
+
+# There doesn't seem to be much of a difference between those in 
+
 
 
