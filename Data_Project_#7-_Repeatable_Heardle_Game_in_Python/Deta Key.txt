@@ -1,0 +1,5 @@
+Project Key: b0q1ulyk_WzgVC8Eo8BZbjSJMdqSNr8LYA5NxbnMK
+
+Project ID : b0q1ulyk
+
+Endpoint: https://3ngh6e.deta.dev
